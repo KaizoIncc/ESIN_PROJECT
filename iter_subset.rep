@@ -1,0 +1,10 @@
+nat _n;                    // Tamaño total del conjunto {1, ..., n}/Mida total del conjunt {1, ..., n}
+nat _k;                    // Tamaño de los subconjuntos/Mida dels subconjunts
+subset current_subset;    // Subconjunto actual/Subconjunt actual
+bool is_end;              // Indica si el iterador ha alcanzado el final/Indica si el iterador ha arribat al final
+
+// Método auxiliar para inicializar el primer subconjunto/Métode auxiliar per inicialitzar el primer subconjunt
+void initialize_first_subset();
+
+// Método auxiliar para generar el siguiente subconjunto/Métode auxiliar per generar el següent subconjunt
+bool generate_next_subset();
