@@ -105,7 +105,7 @@ iter_subset iter_subset::operator++(int) throw() {
 }
 
 bool iter_subset::operator==(const iter_subset& other) const throw() {
-    return is_end == other.is_end && current_subset == other.current_subset;
+    return is_end == other.is_end && current_subset == other.current_subset && _n == other._n && _k == other._k;
 }
 
 bool iter_subset::operator!=(const iter_subset& other) const throw() {
