@@ -1,50 +1,48 @@
 #include "diccionari.hpp"
 
-diccionari() throw(error);
+diccionari::diccionari() throw(error) {
 
-/* Tres grans. Constructor per còpia, operador d'assignació i destructor. */
+}
+
+/* Tres grans. Constructor per cï¿½pia, operador d'assignaciï¿½ i destructor. */
 diccionari::diccionari(const diccionari& D) throw(error) {
 
 }
 
-diccionari::diccionari& operator=(const diccionari& D) throw(error) {
-
+diccionari& diccionari::operator=(const diccionari& D) throw(error) {
+    return *this;
 }
 
 diccionari::~diccionari() throw() {
 
 }
 
-
 /* Pre:  Cert
    Post: Afegeix la paraula p al diccionari; si la paraula p ja
-   formava part del diccionari, l'operació no té cap efecte. */
+   formava part del diccionari, l'operaciï¿½ no tï¿½ cap efecte. */
 void diccionari::insereix(const string& p) throw(error) {
-
-
 
 }
 
 /* Pre:  Cert
-   Post: Retorna el prefix més llarg de p que és una paraula que
-   pertany al diccionari, o dit d'una forma més precisa, retorna la
-   paraula més llarga del diccionari que és prefix de p. */
+   Post: Retorna el prefix mï¿½s llarg de p que ï¿½s una paraula que
+   pertany al diccionari, o dit d'una forma mï¿½s precisa, retorna la
+   paraula mï¿½s llarga del diccionari que ï¿½s prefix de p. */
 string diccionari::prefix(const string& p) const throw(error) {
-
+    return "alo";
 }
 
 /* Pre:  Cert
    Post: Retorna la llista de paraules del diccionari que satisfan
-   el patró especificat en el vector d'strings q, en ordre
-   alfabètic ascendent. */
-void diccionari::satisfan_patro(const vector<string>& q,
-    list<string>& L) const throw(error) {
+   el patrï¿½ especificat en el vector d'strings q, en ordre
+   alfabï¿½tic ascendent. */
+void diccionari::satisfan_patro(const vector<string>& q, list<string>& L) const throw(error) {
 
 }
 
 /* Pre:  Cert
    Post: Retorna una llista amb totes les paraules del diccionari
-   de longitud major o igual a k en ordre alfabètic ascendent. */
+   de longitud major o igual a k en ordre alfabï¿½tic ascendent. */
 void diccionari::llista_paraules(nat k, list<string>& L) const throw(error) {
 
 }
@@ -54,6 +52,3 @@ void diccionari::llista_paraules(nat k, list<string>& L) const throw(error) {
 nat diccionari::num_pal() const throw() {
     return _paraules;
 }
-
-
-

@@ -83,7 +83,7 @@ bool iter_subset::end() const throw() {
     Post: Retorna el subconjunt apuntat per l'iterador;
     llança un error si l'iterador apunta al sentinella. */
 subset iter_subset::operator*() const throw(error) {
-    if(is_end) throw error(IterSubsetIncorr, "El iterador apunta al sentinella.");
+    if(is_end) throw error(IterSubsetIncorr);
     return current_subset;
 }
 
