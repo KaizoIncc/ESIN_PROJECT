@@ -4,11 +4,12 @@
 // treballar amb grans volums de dades amb relacions de prefix
 struct node{
 	char _c;
-	node* _primfill;
-	node* _seggerm;
-
-	char _simbol;
+	node* _fd;
+	node* _fe;
+	node* _cen;
 };
 node* _arrel; 
 nat _paraules; //guarda el nombre total de paraules que te el diccionari
-	
+void esborra_nodes(node* t); 	
+bool busca(node* n, string p);
+
