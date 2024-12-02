@@ -74,7 +74,7 @@ iter_subset::~iter_subset() throw() {
     de k elements presos d'entre n; o dit d'una altra forma, retorna
     cert quan l'iterador apunta a un subconjunt sentinella fictici
     que queda a continuació de l'últim subconjunt vàlid. */
-bool iter_subset::end() const {
+bool iter_subset::end() const throw() {
     return is_end;
 }
 
@@ -83,7 +83,7 @@ bool iter_subset::end() const {
     Post: Retorna el subconjunt apuntat per l'iterador;
     llança un error si l'iterador apunta al sentinella. */
 subset iter_subset::operator*() const throw(error) {
-    if(is_end) throw(IterSubsetIncorr, "El iterador apunta al sentinella.");
+    if(is_end) throw error(IterSubsetIncorr, "El iterador apunta al sentinella.");
     return current_subset;
 }
 
