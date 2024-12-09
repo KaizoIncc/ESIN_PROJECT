@@ -118,11 +118,16 @@ nat diccionari::num_pal() const throw() {
 
 
 
-/* void diccionari::esborra_nodes(node *t) {
+
+/* Pre:  Cert
+   Post: Elimina tots els nodes  */
+/* 
+void diccionari::esborra_nodes(node *t) {
    if (t != nullptr) {
       esborra_nodes(t->_fd);
       esborra_nodes(t->_fe);
-      esborra_nodes(t->_cen) delete t;
+      esborra_nodes(t->_cen);
+      delete t;
    }
 } */
 
