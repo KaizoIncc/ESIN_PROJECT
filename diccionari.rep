@@ -1,7 +1,11 @@
+﻿
+
+//Hem escullit TST perque consumeix menys memòria en comparació amb trie amb punters i trie primerfill seguentgerma
+//Manté l’ordenació lèxica, facilitant operacions com recorreguts ordenats.
+//El cost de la cerca i inserció seria O(L⋅logn)
+//Es adequat per gestionar diccionaris molt grans amb prefixes compartits.
 
 
-//hem escullit trie perque necessitem cerques prefixades i
-// treballar amb grans volums de dades amb relacions de prefix
 struct node{
 	char _c;
 	node* _fd;
@@ -12,4 +16,4 @@ node* _arrel;
 nat _paraules; //guarda el nombre total de paraules que te el diccionari
 void esborra_nodes(node* t); 	
 bool busca(node* n, string p);
-
+node* copia_nodes(const node* t);
