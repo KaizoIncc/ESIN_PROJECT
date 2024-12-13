@@ -92,7 +92,39 @@ void diccionari::insereix(const string &p) throw(error) {
    pertany al diccionari, o dit d'una forma m�s precisa, retorna la
    paraula m�s llarga del diccionari que �s prefix de p. */
 string diccionari::prefix(const string &p) const throw(error) {
-   return "alo";
+    node* actual = _arrel; 
+    string prefix = ""; 
+    string millor = ""; 
+
+    if (busca(p)) return p;
+    
+    for (char c : p) {
+       
+        while (actual != nullptr and actual->_c != c) {
+            if (c < actual->_c) {
+                actual = actual->_fe; 
+            }
+            else {
+                actual = actual->_fd;
+            }
+        }
+
+       
+        if (actual != nullptr and actual->_c == c) {
+            prefix += c;
+
+
+            if (actual->_cen != nullptr and actual->_cen->_c == '#') {
+                millor = prefix;
+            }
+
+            actual = actual->_cen;
+        }
+        else break;
+       
+    }
+
+    return millor; 
 }
 
 /* Pre:  Cert
