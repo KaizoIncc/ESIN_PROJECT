@@ -1,8 +1,6 @@
-DEBUGOPCIONS = -ansi -D_JUDGE -D_GLIBCXX_DEBUG -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -std=c++17
-DEBUGOPCIONS_WITHOUT_ERROR = -ansi -D_JUDGE -O2 -Wall -Wextra -Wno-deprecated -Wno-unused-parameter -std=c++11
-DEBUGOPCIONS_WITHOUT_ERROR = -D_JUDGE -O2 -Wall -Wextra -std=c++11
-RELEASEOPCIONS = -ansi -D_JUDGE -O2 -Wall -Wextra -Werror -std=c++17
-OPCIONS = -std=c++20 -g -O0 -ansi -Wall -Werror
+DEBUGOPCIONS = -std=c++14 -Wall -Wno-deprecated -g -O0
+RELEASEOPCIONS = -std=c++14 -Wall -Wno-deprecated -Werror -O2
+OPCIONS = $(DEBUGOPCIONS)
 
 driver_joc_par.e: driver_joc_par.o obte_paraules.o anagrames.o word_toolkit.o diccionari.o iter_subset.o
 	g++ -o driver_joc_par.e driver_joc_par.o obte_paraules.o anagrames.o word_toolkit.o diccionari.o iter_subset.o -lesin

@@ -1,4 +1,4 @@
-﻿
+
 
 //Hem escullit TST perque consumeix menys memòria en comparació amb trie amb punters i trie primerfill seguentgerma
 //Manté l’ordenació lèxica, facilitant operacions com recorreguts ordenats.
@@ -15,5 +15,5 @@ struct node{
 node* _arrel; 
 nat _paraules; //guarda el nombre total de paraules que te el diccionari
 void esborra_nodes(node* t); 	
-bool busca(node* n, string p);
+bool busca(node* n, string p) const;
 node* copia_nodes(const node* t);

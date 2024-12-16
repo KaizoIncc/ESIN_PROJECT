@@ -1,47 +1,44 @@
 #include "diccionari.hpp"
 
 diccionari::diccionari() throw(error) {
-   // _arrel = nullptr;
+    _arrel = nullptr;
     //_paraules=0;
-
 }
 
 /* Tres grans. Constructor per copia, operador d'assignacio i destructor. */
 diccionari::diccionari(const diccionari &D) throw(error) {
-
     //_arrel=copia_nodes(D._arrel);
     //_paraules=D._paraules;
 }
 
 diccionari &diccionari::operator=(const diccionari &D) throw(error) {
-    //_arrel = copia_nodes(D._arrel);
-    //_paraules=D._paraules;
+    _arrel = copia_nodes(D._arrel);
+    _paraules = D._paraules;
 
-   return *this;
+    return *this;
 }
 
-
 diccionari::~diccionari() throw() {
-   // esborra_nodes(_arrel);
+    esborra_nodes(_arrel);
 }
 
 /* Pre:  Cert
    Post: Afegeix la paraula p al diccionari; si la paraula p ja
    formava part del diccionari, l'operaci� no t� cap efecte. */
 void diccionari::insereix(const string &p) throw(error) {
-    if(busca(p)) return;
+    if (busca(_arrel, p)) return;
 
-    else{
+    else {
         if (_arrel == nullptr) {
             _arrel = new node;
             _arrel->_c = p[0];
             _arrel->_fe = _arrel->_fd = _arrel->_cen = nullptr;
         }
 
-        node* actual = _arrel;
+        node *actual = _arrel;
         int i = 0;
 
-        while (i < p.size()) {
+        while (i < (int)p.size()) {
             char c = p[i];
 
             if (c < actual->_c) {
@@ -61,7 +58,7 @@ void diccionari::insereix(const string &p) throw(error) {
                 actual = actual->_fd;
             }
             else { // Si el caràcter coincideix...
-                if (i == p.size() - 1) { // Si és l'últim caràcter.
+                if (i == (int)p.size() - 1) { // Si és l'últim caràcter.
                     if (actual->_cen == nullptr) {
                         actual->_cen = new node;
                         actual->_cen->_c = '#';
@@ -81,50 +78,38 @@ void diccionari::insereix(const string &p) throw(error) {
                 }
             }
         }
-
     }
-
 }
-
 
 /* Pre:  Cert
    Post: Retorna el prefix m�s llarg de p que �s una paraula que
    pertany al diccionari, o dit d'una forma m�s precisa, retorna la
    paraula m�s llarga del diccionari que �s prefix de p. */
 string diccionari::prefix(const string &p) const throw(error) {
-    node* actual = _arrel; 
-    string prefix = ""; 
-    string millor = ""; 
+    node *actual = _arrel;
+    string prefix = "";
+    string millor = "";
 
-    if (busca(p)) return p;
-    
+    if (busca(_arrel, p)) return p;
+
     for (char c : p) {
-       
+
         while (actual != nullptr and actual->_c != c) {
-            if (c < actual->_c) {
-                actual = actual->_fe; 
-            }
-            else {
-                actual = actual->_fd;
-            }
+            if (c < actual->_c) actual = actual->_fe;
+            else actual = actual->_fd;
         }
 
-       
         if (actual != nullptr and actual->_c == c) {
             prefix += c;
 
-
-            if (actual->_cen != nullptr and actual->_cen->_c == '#') {
-                millor = prefix;
-            }
+            if (actual->_cen != nullptr and actual->_cen->_c == '#') millor = prefix;
 
             actual = actual->_cen;
         }
         else break;
-       
     }
 
-    return millor; 
+    return millor;
 }
 
 /* Pre:  Cert
@@ -145,58 +130,51 @@ void diccionari::llista_paraules(nat k, list<string> &L) const throw(error) {
 /* Pre:  Cert
    Post: Retorna el nombre de paraules en el diccionari. */
 nat diccionari::num_pal() const throw() {
-   return _paraules;
+    return _paraules;
 }
-
-
-
 
 /* Pre:  Cert
    Post: Elimina tots els nodes  */
-/* 
 void diccionari::esborra_nodes(node *t) {
-   if (t != nullptr) {
-      esborra_nodes(t->_fd);
-      esborra_nodes(t->_fe);
-      esborra_nodes(t->_cen);
-      delete t;
-   }
-} */
+    if (t != nullptr) {
+        esborra_nodes(t->_fd);
+        esborra_nodes(t->_fe);
+        esborra_nodes(t->_cen);
+        delete t;
+    }
+}
 
-/*node* diccionari::copia_nodes(const node* t) {
+typename diccionari::node *diccionari::copia_nodes(const node *t) {
 
-    if (t == nullptr) return nullptr; 
+    if (t == nullptr) return nullptr;
 
     // Creem un nou node amb la mateixa informació del node original.
-    node* nou = new node;
+    node *nou = new node;
     nou->_c = t->_c;
-    nou->_fd = copia_nodes(t->_fd); // Copiem el fill dret.
-    nou->_fe = copia_nodes(t->_fe); // Copiem el fill esquerre.
+    nou->_fd = copia_nodes(t->_fd);   // Copiem el fill dret.
+    nou->_fe = copia_nodes(t->_fe);   // Copiem el fill esquerre.
     nou->_cen = copia_nodes(t->_cen); // Copiem el fill central.
 
-    return nou; 
+    return nou;
 }
-*/
 
 // Pre:p no es buit
 // Post:retorna true si p esta dins el diccionari, false al contrari
-/* bool diccionari::busca(node* n, string p) {
-   node n = _arrel;
-   int i = 0;
+bool diccionari::busca(node *n, string p) const {
+    int i = 0;
 
-   while (p != nullptr) {
-      char c = p[i];
-      if( c < n->_c ) n=n->_fe;
-      else if(c > n->_c) n=n->_fd;
-      else{
-        if(i==p.size()-1){
-            return n->_c=='#';
+    while (!p.empty()) {
+        char c = p[i];
+        if (c < n->_c) n = n->_fe;
+        else if (c > n->_c) n = n->_fd;
+        else {
+            if (i == (int)p.size() - 1) return n->_c == '#';
+            else {
+                n = n->_cen;
+                i++;
+            }
         }
-        else{
-            n=n->_cen;
-            i++;
-        }
+    }
 
-      }
-   }
-} */
+    return false;
+}
