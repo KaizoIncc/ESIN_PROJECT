@@ -1,9 +1,10 @@
 
 
-//Hem escullit TST perque consumeix menys memòria en comparació amb trie amb punters i trie primerfill seguentgerma
+//Hem escullit TST perque consumeix menys memòria en comparació amb trie amb punters 
 //Manté l’ordenació lèxica, facilitant operacions com recorreguts ordenats.
-//El cost de la cerca i inserció seria O(L⋅logn)
+//El cost de la cerca i inserció seria O(L⋅logn)  (cal posar n i L que es)
 //Es adequat per gestionar diccionaris molt grans amb prefixes compartits.
+(comparar amb altres)
 
 
 struct node{
@@ -12,8 +13,12 @@ struct node{
 	node* _fe;
 	node* _cen;
 };
+
 node* _arrel; 
 nat _paraules; //guarda el nombre total de paraules que te el diccionari
 void esborra_nodes(node* t); 	
 bool busca(node* n, string p) const;
 node* copia_nodes(const node* t);
+void paraules(node* n, string p, nat k, list<string>& L) const;
+void satisfa(node* arrel, const vector<string>& q, int i, string actual, list<string>& L) const;
+bool hi_es(char c, string s);

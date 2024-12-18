@@ -1,14 +1,15 @@
 #include "diccionari.hpp"
+#include"word_toolkit.hpp"
 
 diccionari::diccionari() throw(error) {
     _arrel = nullptr;
-    //_paraules=0;
+    _paraules=0;
 }
 
 /* Tres grans. Constructor per copia, operador d'assignacio i destructor. */
 diccionari::diccionari(const diccionari &D) throw(error) {
-    //_arrel=copia_nodes(D._arrel);
-    //_paraules=D._paraules;
+    _arrel=copia_nodes(D._arrel);
+    _paraules=D._paraules;
 }
 
 diccionari &diccionari::operator=(const diccionari &D) throw(error) {
@@ -117,13 +118,15 @@ string diccionari::prefix(const string &p) const throw(error) {
    el patr� especificat en el vector d'strings q, en ordre
    alfab�tic ascendent. */
 void diccionari::satisfan_patro(const vector<string> &q, list<string> &L) const throw(error) {
-
+    satisfa(_arrel, q, 0, "", L);
 }
 
 /* Pre:  Cert
    Post: Retorna una llista amb totes les paraules del diccionari
    de longitud major o igual a k en ordre alfab�tic ascendent. */
 void diccionari::llista_paraules(nat k, list<string> &L) const throw(error) {
+    L.clear(); //volem una llista buida
+    paraules(_arrel, "", k, L);
 
 }
 
@@ -177,4 +180,55 @@ bool diccionari::busca(node *n, string p) const {
     }
 
     return false;
+}
+void diccionari::paraules(node* n, string p, nat k, list<string>& L) const {
+
+    if (n == nullptr) return;
+
+    paraules(n->_fe, p, k, L);
+
+    if (n->_c == '#') {
+        if (p.size() >= k) L.push_back(p);
+    }
+    else paraules(n->_cen, p + n->_c, k, L);
+
+    paraules(n->_fd, p, k, L);
+
+
+}
+void diccionari::satisfa(node* p const vector<string>& q, int i, string actual, list<string>& L) const {
+    if (!arrel) return; // Si no hi ha node, sortim
+
+    
+    if (i == q.size()) {
+        if (p->_c == '#') {
+            L.push_back(actual); 
+        }
+        return;
+    }
+
+    string lletres = q[i];
+    anagrama_canonic(lletres);
+
+   
+    if (hi_es(q[i],lletres) {
+
+        string nou_actual = actual + p->_c;
+ 
+        satisfa(p->_cen, q, i + 1, nou_actual, L); 
+    }
+
+   
+    satisfa(p->_fe, q, i, actual, L); 
+    satisfa(p->_fd, q, i, actual, L); 
+}
+
+bool diccionari::hi_es(char c, string s) {
+    bool trobat = false;
+    int i = 0;
+    while (not trobat and i < s.size()) {
+        if (c == s[i]) trobat = true;
+        else ++i;
+    }
+    return trobat;
 }
