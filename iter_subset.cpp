@@ -105,7 +105,23 @@ iter_subset iter_subset::operator++(int) throw() {
 }
 
 bool iter_subset::operator==(const iter_subset& other) const throw() {
-    return is_end == other.is_end && current_subset == other.current_subset && _n == other._n && _k == other._k;
+    // Caso especial: si k = 0, ambos iteradores apuntan al mismo subconjunto vacío
+    if (_k == 0 && other._k == 0) {
+        return is_end == other.is_end; // Compara únicamente el estado final
+    }
+
+    // Compara el tamaño total del conjunto y el tamaño de los subconjuntos
+    if (_n != other._n || _k != other._k) {
+        return false; // No pueden ser iguales si n o k son diferentes
+    }
+
+    // Compara el estado final de los iteradores
+    if (is_end != other.is_end) {
+        return false; // Si uno está al final y el otro no, no son iguales
+    }
+
+    // Compara los subconjuntos actuales
+    return current_subset == other.current_subset;
 }
 
 bool iter_subset::operator!=(const iter_subset& other) const throw() {
