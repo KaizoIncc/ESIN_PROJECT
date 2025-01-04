@@ -1,234 +1,131 @@
 #include "diccionari.hpp"
-#include"word_toolkit.hpp"
 
+/* FUNCIONS PUBLIQUES */
+
+// Constructor
 diccionari::diccionari() throw(error) {
-    _arrel = nullptr;
-    _paraules=0;
+    _arrel = new TrieNode();
 }
 
-/* Tres grans. Constructor per copia, operador d'assignacio i destructor. */
-diccionari::diccionari(const diccionari &D) throw(error) {
-    _arrel=copia_nodes(D._arrel);
-    _paraules=D._paraules;
+// Destructor
+diccionari::~diccionari() throw() {
+    deleteTrie(_arrel);
 }
 
-diccionari &diccionari::operator=(const diccionari &D) throw(error) {
-    _arrel = copia_nodes(D._arrel);
-    _paraules = D._paraules;
+// Constructor por copia
+diccionari::diccionari(const diccionari& D) throw(error) {
+    // Copiamos el Trie
+    _arrel = copyTrie(D._arrel);
+}
 
+// Operador de asignación
+diccionari& diccionari::operator=(const diccionari& D) throw(error) {
+    if (this != &D) {  // Comprobamos que no estamos asignando el mismo objeto
+        // Liberamos la memoria del diccionario actual
+        deleteTrie(_arrel);
+        // Copiamos la nueva información
+        _arrel = copyTrie(D._arrel);
+    }
     return *this;
 }
 
-diccionari::~diccionari() throw() {
-    esborra_nodes(_arrel);
-}
+// Inserción de una palabra
+void diccionari::insereix(const string& p) throw(error) {
+    TrieNode* node = _arrel;
 
-/* Pre:  Cert
-   Post: Afegeix la paraula p al diccionari; si la paraula p ja
-   formava part del diccionari, l'operaci� no t� cap efecte. */
-void diccionari::insereix(const string &p) throw(error) {
-    if (busca(_arrel, p)) return;
-
-    else {
-        if (_arrel == nullptr) {
-            _arrel = new node;
-            _arrel->_c = p[0];
-            _arrel->_fe = _arrel->_fd = _arrel->_cen = nullptr;
-        }
-
-        node *actual = _arrel;
-        int i = 0;
-
-        while (i < (int)p.size()) {
-            char c = p[i];
-
-            if (c < actual->_c) {
-                if (actual->_fe == nullptr) {
-                    actual->_fe = new node;
-                    actual->_fe->_c = c;
-                    actual->_fe->_fe = actual->_fe->_fd = actual->_fe->_cen = nullptr;
-                }
-                actual = actual->_fe;
-            }
-            else if (c > actual->_c) {
-                if (actual->_fd == nullptr) {
-                    actual->_fd = new node;
-                    actual->_fd->_c = c;
-                    actual->_fd->_fe = actual->_fd->_fd = actual->_fd->_cen = nullptr;
-                }
-                actual = actual->_fd;
-            }
-            else { // Si el caràcter coincideix...
-                if (i == (int)p.size() - 1) { // Si és l'últim caràcter.
-                    if (actual->_cen == nullptr) {
-                        actual->_cen = new node;
-                        actual->_cen->_c = '#';
-                        actual->_cen->_fe = actual->_cen->_fd = actual->_cen->_cen = nullptr;
-                        _paraules++; // Incrementem només si afegim un final de paraula.
-                    }
-                    break;
-                }
-                else {
-                    if (actual->_cen == nullptr) {
-                        actual->_cen = new node;
-                        actual->_cen->_c = p[i + 1];
-                        actual->_cen->_fe = actual->_cen->_fd = actual->_cen->_cen = nullptr;
-                    }
-                    actual = actual->_cen;
-                    i++;
-                }
-            }
-        }
-    }
-}
-
-/* Pre:  Cert
-   Post: Retorna el prefix m�s llarg de p que �s una paraula que
-   pertany al diccionari, o dit d'una forma m�s precisa, retorna la
-   paraula m�s llarga del diccionari que �s prefix de p. */
-string diccionari::prefix(const string &p) const throw(error) {
-    node *actual = _arrel;
-    string prefix = "";
-    string millor = "";
-
-    if (busca(_arrel, p)) return p;
-
-    for (char c : p) {
-
-        while (actual != nullptr and actual->_c != c) {
-            if (c < actual->_c) actual = actual->_fe;
-            else actual = actual->_fd;
-        }
-
-        if (actual != nullptr and actual->_c == c) {
-            prefix += c;
-
-            if (actual->_cen != nullptr and actual->_cen->_c == '#') millor = prefix;
-
-            actual = actual->_cen;
-        }
-        else break;
-    }
-
-    return millor;
-}
-
-/* Pre:  Cert
-   Post: Retorna la llista de paraules del diccionari que satisfan
-   el patr� especificat en el vector d'strings q, en ordre
-   alfab�tic ascendent. */
-void diccionari::satisfan_patro(const vector<string> &q, list<string> &L) const throw(error) {
-    satisfa(_arrel, q, 0, "", L);
-}
-
-/* Pre:  Cert
-   Post: Retorna una llista amb totes les paraules del diccionari
-   de longitud major o igual a k en ordre alfab�tic ascendent. */
-void diccionari::llista_paraules(nat k, list<string> &L) const throw(error) {
-    L.clear(); //volem una llista buida
-    paraules(_arrel, "", k, L);
-
-}
-
-/* Pre:  Cert
-   Post: Retorna el nombre de paraules en el diccionari. */
-nat diccionari::num_pal() const throw() {
-    return _paraules;
-}
-
-/* Pre:  Cert
-   Post: Elimina tots els nodes  */
-void diccionari::esborra_nodes(node *t) {
-    if (t != nullptr) {
-        esborra_nodes(t->_fd);
-        esborra_nodes(t->_fe);
-        esborra_nodes(t->_cen);
-        delete t;
-    }
-}
-
-typename diccionari::node *diccionari::copia_nodes(const node *t) {
-
-    if (t == nullptr) return nullptr;
-
-    // Creem un nou node amb la mateixa informació del node original.
-    node *nou = new node;
-    nou->_c = t->_c;
-    nou->_fd = copia_nodes(t->_fd);   // Copiem el fill dret.
-    nou->_fe = copia_nodes(t->_fe);   // Copiem el fill esquerre.
-    nou->_cen = copia_nodes(t->_cen); // Copiem el fill central.
-
-    return nou;
-}
-
-// Pre:p no es buit
-// Post:retorna true si p esta dins el diccionari, false al contrari
-bool diccionari::busca(node *n, string p) const {
-    int i = 0;
-
-    while (!p.empty()) {
+    for (size_t i = 0; i < p.length(); ++i) {
         char c = p[i];
-        if (c < n->_c) n = n->_fe;
-        else if (c > n->_c) n = n->_fd;
-        else {
-            if (i == (int)p.size() - 1) return n->_c == '#';
-            else {
-                n = n->_cen;
-                i++;
-            }
-        }
+        if (node->_children[c - 'a'] == nullptr) node->_children[c - 'a'] = new TrieNode();
+        node = node->_children[c - 'a'];
     }
 
-    return false;
+    if (!node->isEndOfWord) node->isEndOfWord = true; // Only mark if it's not already marked
 }
-void diccionari::paraules(node* n, string p, nat k, list<string>& L) const {
 
-    if (n == nullptr) return;
 
-    paraules(n->_fe, p, k, L);
+// Buscar el prefijo más largo
+string diccionari::prefix(const string& p) const throw(error) {
+    TrieNode* node = _arrel;
+    string longestPrefix;
+    string currentPrefix;
 
-    if (n->_c == '#') {
-        if (p.size() >= k) L.push_back(p);
+    for (size_t i = 0; i < p.length(); ++i) {
+        char c = p[i];
+        if (node->_children[c - 'a'] == nullptr) break;
+
+        node = node->_children[c - 'a'];
+        currentPrefix += c;
+
+        if (node->isEndOfWord) longestPrefix = currentPrefix;
     }
-    else paraules(n->_cen, p + n->_c, k, L);
 
-    paraules(n->_fd, p, k, L);
-
-
+    return longestPrefix;
 }
-void diccionari::satisfa(node* p const vector<string>& q, int i, string actual, list<string>& L) const {
-    if (!arrel) return; // Si no hi ha node, sortim
 
-    
-    if (i == q.size()) {
-        if (p->_c == '#') {
-            L.push_back(actual); 
-        }
+// Función de patrón
+void diccionari::satisfan_patro(const vector<string>& q, list<string>& L) const throw(error) {
+    satisfan_patroRecursive(_arrel, q, 0, "", L);
+}
+
+// Lista de palabras de longitud >= k
+void diccionari::llista_paraules(unsigned int k, list<string>& L) const throw(error) {
+    llista_paraulesRecursive(_arrel, k, "", L);
+}
+
+// Número de palabras
+nat diccionari::num_pal() const throw() {
+    return countWords(_arrel);
+}
+
+/* FUNCIONS PRIVADES */
+
+// Contar las palabras
+nat diccionari::countWords(TrieNode* node) const throw() {
+    nat count = 0;
+    if (node->isEndOfWord) count++;
+    for (int i = 0; i < 26; i++) {
+        if (node->_children[i] != nullptr) count += countWords(node->_children[i]);
+    }
+    return count;
+}
+
+// Recursiva para buscar palabras que coincidan con el patrón
+void diccionari::satisfan_patroRecursive(TrieNode* node, const vector<string>& q, size_t index, string current, list<string>& L) const throw() {
+    if (index == q.size()) {
+        if (node->isEndOfWord) L.push_back(current);
         return;
     }
 
-    string lletres = q[i];
-    anagrama_canonic(lletres);
-
-   
-    if (hi_es(q[i],lletres) {
-
-        string nou_actual = actual + p->_c;
- 
-        satisfa(p->_cen, q, i + 1, nou_actual, L); 
+    string pattern = q[index];
+    for (char c : pattern) {
+        int idx = c - 'A';
+        if (node->_children[idx] != nullptr) satisfan_patroRecursive(node->_children[idx], q, index + 1, current + c, L);
     }
-
-   
-    satisfa(p->_fe, q, i, actual, L); 
-    satisfa(p->_fd, q, i, actual, L); 
 }
 
-bool diccionari::hi_es(char c, string s) {
-    bool trobat = false;
-    int i = 0;
-    while (not trobat and i < s.size()) {
-        if (c == s[i]) trobat = true;
-        else ++i;
+// Recursiva para encontrar palabras de longitud >= k
+void diccionari::llista_paraulesRecursive(TrieNode* node, nat k, string current, list<string>& L) const throw() {
+    if (current.size() >= k && node->isEndOfWord) L.push_back(current);
+    for (int i = 0; i < 26; i++) {
+        if (node->_children[i] != nullptr) llista_paraulesRecursive(node->_children[i], k, current + char('A' + i), L);
     }
-    return trobat;
+}
+
+typename diccionari::TrieNode* diccionari::copyTrie(TrieNode* node) const {
+    if (node == nullptr) return nullptr;
+
+    TrieNode* newNode = new TrieNode();
+    newNode->isEndOfWord = node->isEndOfWord;
+    for (int i = 0; i < 26; ++i) {
+        if (node->_children[i] != nullptr) newNode->_children[i] = copyTrie(node->_children[i]);
+    }
+    return newNode;
+}
+
+void diccionari::deleteTrie(TrieNode* node) {
+    if (node == nullptr) return;
+    for (int i = 0; i < 26; ++i) {
+        if (node->_children[i] != nullptr) deleteTrie(node->_children[i]);
+    }
+    delete node;
 }

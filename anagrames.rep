@@ -1,0 +1,11 @@
+struct GrupAnagrames {
+    string canonic; // Anagrama canònic
+    list<string> paraules; // Paraules amb el mateix anagrama canònic
+};
+vector<GrupAnagrames> grups; // Llista de grups d'anagrames
+// Genera l'anagrama canònic d'una paraula
+string anagrama_canonic(const string& paraula) const;
+// Cerca el grup d'anagrames pel canònic
+GrupAnagrames* busca_grup(const string& canonic);
+// Ordena un string de manera alfabètica
+void ordena_string(std::string& s) const;
