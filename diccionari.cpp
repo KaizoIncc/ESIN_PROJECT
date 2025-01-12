@@ -152,9 +152,9 @@ void diccionari::llista_paraules(nat k, list<string>& L) const throw(error) {
 // Mètode per obtenir el nombre de paraules
 // PRE: Cert
 // POST: Retorna el nombre total de paraules emmagatzemades al diccionari.
-// COSTE: O(n), on n és el nombre de nodes del Trie.
+// COSTE: O(1)
 nat diccionari::num_pal() const throw() {
-    return comptar_paraules(_arrel);
+    return _paraules;
 }
 
 // Funció recursiva per copiar el Trie
@@ -205,24 +205,4 @@ void diccionari::obtindre_paraules(TrieNode* node, string& actual, nat k, list<s
     actual.pop_back();
 
     obtindre_paraules(node->_dre, actual, k, L);
-}
-
-// Funció recursiva per comptar el nombre de paraules
-// PRE: node és un punter a un subarbre vàlid o nullptr.
-// POST: Retorna el nombre total de paraules en el subarbre apuntat per node.
-// COST: O(n), on n és el nombre de nodes en el subarbre apuntat per node.
-nat diccionari::comptar_paraules(TrieNode* node) const {
-
-    if (!node) return 0;
-
-    nat total = 0;
-    
-    total += comptar_paraules(node->_esq);
-    
-    if (node->_cen && node->_cen->_c == '#') total += 1;
-    
-    total += comptar_paraules(node->_cen);
-    
-    total += comptar_paraules(node->_dre);
-    return total;
 }
