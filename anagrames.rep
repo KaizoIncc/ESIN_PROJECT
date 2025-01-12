@@ -1,11 +1,4 @@
-struct GrupAnagrames {
-    string canonic; // Anagrama canònic
-    list<string> paraules; // Paraules amb el mateix anagrama canònic
-};
-vector<GrupAnagrames> grups; // Llista de grups d'anagrames
-// Genera l'anagrama canònic d'una paraula
-string anagrama_canonic(const string& paraula) const;
-// Cerca el grup d'anagrames pel canònic
-GrupAnagrames* busca_grup(const string& canonic);
-// Ordena un string de manera alfabètica
-void ordena_string(std::string& s) const;
+//una llista de pair que conte un string, que sera l'anagrama canonic, i una llista de string, on es guardara totes les paraules que siguin anagrames
+//hem escollit utilizar aquesta estructura perque volem que la llista anagram i anagram.second estigui ordenada, amb iterador de la llista sera mes facil quan volem insertar un pair en una posicio concreta de la llista que amb un vector.
+
+list<pair<string, list<string>>> anagram;
