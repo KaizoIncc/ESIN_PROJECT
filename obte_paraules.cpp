@@ -1,4 +1,6 @@
 #include "obte_paraules.hpp"
+#include "iter_subset.hpp"
+#include "word_toolkit.hpp"
 
 /* Pre:  Cert
     Post: Retorna la llista de paraules que es poden formar usant k lletres
