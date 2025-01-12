@@ -22,8 +22,16 @@ struct TrieNode {
 
 TrieNode* _arrel; // Raíz del trie
 
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Retorna una còpia exacta del subarbre apuntat per node. Si node == nullptr, retorna nullptr.
 TrieNode* copia(TrieNode* node);
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Allibera tota la memòria associada al subarbre apuntat per node. Si node == nullptr, no fa res.
 void allibera(TrieNode* node);
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Retorna el nombre total de paraules en el subarbre apuntat per node.
 nat comptar_paraules(TrieNode* node) const;
+// PRE: node és un punter a un subarbre vàlid o nullptr. k >= 0.
+// POST: Afegeix a L totes les paraules del subarbre apuntat per node amb longitud >= k.
 void obtindre_paraules(TrieNode* node, string& actual, nat k, list<string>& L) const;
 
