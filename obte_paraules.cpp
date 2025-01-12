@@ -4,6 +4,8 @@
     Post: Retorna la llista de paraules que es poden formar usant k lletres
     de la paraula s. Llança error si k és major que la longitud de
     l'string s o k < 3. */
+
+//cost:O(s.size()^k * (k + n + m)) on n és el nombre d'anagrame, m és la mida de la llista paraules.
 void obte_paraules::obte_paraules(nat k, const string& s, const anagrames& A, list<string>& paraules) throw(error) {
     
     if (k < 3 || k > s.size()) throw error(LongitudInvalida);
@@ -46,6 +48,8 @@ void obte_paraules::obte_paraules(nat k, const string& s, const anagrames& A, li
     de la paraula s. La llista estarà ordenada de menys a més longitud; 
     a igual longitud les paraules estan en ordre alfabètic creixent. 
     Llança un error si l'string s té menys de tres lletres. */
+
+//cost:O(s.size()^3 * (3 + n + m)) 
 void obte_paraules::obte_paraules(const string& s, const anagrames& A, list<string>& paraules) throw(error) {
    
     if (s.size() < 3) throw error(LongitudInvalida);
