@@ -1,4 +1,6 @@
 //una llista de pair que conte un string, que sera l'anagrama canonic, i una llista de string, on es guardara totes les paraules que siguin anagrames
-//hem escollit utilizar aquesta estructura perque volem que la llista anagram i anagram.second estigui ordenada, amb iterador de la llista sera mes facil quan volem insertar un pair en una posicio concreta de la llista que amb un vector.
-
+//hem escollit utilizar aquesta estructura perque volem que la llista anagram i anagram.second estigui ordenada a la hora d'inserir.
+//La llista permet una inserció més fàcil i ràpida en una posició concreta utilitzant un iterador, sense necessitat de desplaçar tots els elements com en un vector.
+//en un vector per inserir tindra un cost O(n), on n és el nombre d'elements.
+//En una llista per inserir te un cost O(1).
 list<pair<string, list<string>>> anagram;
