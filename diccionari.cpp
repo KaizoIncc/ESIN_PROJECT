@@ -8,6 +8,7 @@ using namespace std;
 // COSTE: O(1)
 diccionari::diccionari() throw(error) {
     _arrel = new TrieNode{'\0', nullptr, nullptr, nullptr};
+    _paraules=0;
 }
 
 // Constructor per còpia
@@ -16,6 +17,7 @@ diccionari::diccionari() throw(error) {
 // COSTE: O(n), on n és el nombre de nodes del diccionari D.
 diccionari::diccionari(const diccionari& D) throw(error) {
     _arrel = copia(D._arrel);
+    _paraules=D._paraules;
 }
 
 // Operador d'assignació
@@ -26,6 +28,7 @@ diccionari& diccionari::operator=(const diccionari& D) throw(error) {
     if (this != &D) {
         allibera(_arrel);
         _arrel = copia(D._arrel);
+        _paraules=D._paraules;
     }
     return *this;
 }
@@ -36,6 +39,7 @@ diccionari& diccionari::operator=(const diccionari& D) throw(error) {
 // COSTE: O(n), on n és el nombre de nodes del diccionari.
 diccionari::~diccionari() throw() {
     allibera(_arrel);
+    _paraules=0;
 }
 
 // Mètode per inserir una paraula
