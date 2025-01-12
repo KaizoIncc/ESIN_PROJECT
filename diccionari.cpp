@@ -77,6 +77,7 @@ void diccionari::insereix(const string& p) throw(error) {
     }
 
     if (!actual->_cen) actual->_cen = new TrieNode{'#', nullptr, nullptr, nullptr};
+    ++_paraules;
 }
 
 // Mètode per obtenir el prefix més llarg
