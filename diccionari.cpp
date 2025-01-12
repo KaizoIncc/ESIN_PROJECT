@@ -1,131 +1,228 @@
 #include "diccionari.hpp"
 
-/* FUNCIONS PUBLIQUES */
+using namespace std;
 
-// Constructor
+// Constructor per defecte
+// PRE: Cert
+// POST: Es crea un diccionari buit amb una arrel inicialitzada.
+// COSTE: O(1)
 diccionari::diccionari() throw(error) {
-    _arrel = new TrieNode();
+    _arrel = new TrieNode{'\0', nullptr, nullptr, nullptr};
 }
 
-// Destructor
-diccionari::~diccionari() throw() {
-    deleteTrie(_arrel);
-}
-
-// Constructor por copia
+// Constructor per còpia
+// PRE: Cert
+// POST: El diccionari actual és una còpia exacta del diccionari D.
+// COSTE: O(n), on n és el nombre de nodes del diccionari D.
 diccionari::diccionari(const diccionari& D) throw(error) {
-    // Copiamos el Trie
-    _arrel = copyTrie(D._arrel);
+    _arrel = copia(D._arrel);
 }
 
-// Operador de asignación
+// Operador d'assignació
+// PRE: Cert
+// POST: El diccionari actual és una còpia exacta del diccionari D.
+// COSTE: O(n), on n és el nombre de nodes del diccionari D.
 diccionari& diccionari::operator=(const diccionari& D) throw(error) {
-    if (this != &D) {  // Comprobamos que no estamos asignando el mismo objeto
-        // Liberamos la memoria del diccionario actual
-        deleteTrie(_arrel);
-        // Copiamos la nueva información
-        _arrel = copyTrie(D._arrel);
+    if (this != &D) {
+        allibera(_arrel);
+        _arrel = copia(D._arrel);
     }
     return *this;
 }
 
-// Inserción de una palabra
+// Destructor
+// PRE: Cert
+// POST: Allibera tota la memòria ocupada pel diccionari.
+// COSTE: O(n), on n és el nombre de nodes del diccionari.
+diccionari::~diccionari() throw() {
+    allibera(_arrel);
+}
+
+// Mètode per inserir una paraula
+// PRE: p.size() > 0
+// POST: La paraula p ha estat afegida al diccionari. Si ja existia, el diccionari no canvia.
+// COSTE: O(m), on m és la longitud de la paraula p.
 void diccionari::insereix(const string& p) throw(error) {
-    TrieNode* node = _arrel;
-
-    for (size_t i = 0; i < p.length(); ++i) {
+    
+    TrieNode* actual = _arrel;
+    
+    for (size_t i = 0; i < p.size(); ++i) {
         char c = p[i];
-        if (node->_children[c - 'a'] == nullptr) node->_children[c - 'a'] = new TrieNode();
-        node = node->_children[c - 'a'];
+        TrieNode* anterior = nullptr;
+        
+        while (actual && actual->_c != c) {
+            anterior = actual;
+        
+            if (c < actual->_c) {
+                if (!actual->_esq) actual->_esq = new TrieNode{c, nullptr, nullptr, nullptr};
+                actual = actual->_esq;
+            } else {
+                if (!actual->_dre) actual->_dre = new TrieNode{c, nullptr, nullptr, nullptr};
+                actual = actual->_dre;
+            }
+        }
+        
+        if (!actual) {
+            if (anterior && c < anterior->_c) {
+                anterior->_esq = new TrieNode{c, nullptr, nullptr, nullptr};
+                actual = anterior->_esq;
+            } else if (anterior) {
+                anterior->_dre = new TrieNode{c, nullptr, nullptr, nullptr};
+                actual = anterior->_dre;
+            }
+        }
+
+        if (!actual->_cen) actual->_cen = new TrieNode{'\0', nullptr, nullptr, nullptr};
+        actual = actual->_cen;
     }
 
-    if (!node->isEndOfWord) node->isEndOfWord = true; // Only mark if it's not already marked
+    if (!actual->_cen) actual->_cen = new TrieNode{'#', nullptr, nullptr, nullptr};
 }
 
-
-// Buscar el prefijo más largo
+// Mètode per obtenir el prefix més llarg
+// PRE: Cert
+// POST: Retorna el prefix més llarg de p que es troba al diccionari. Si cap prefix és trobat, retorna "".
+// COSTE: O(m), on m és la longitud de la paraula p.
 string diccionari::prefix(const string& p) const throw(error) {
-    TrieNode* node = _arrel;
-    string longestPrefix;
-    string currentPrefix;
+    TrieNode* actual = _arrel;
+    string resultat;
+    string millor_prefix;
 
-    for (size_t i = 0; i < p.length(); ++i) {
+    for (size_t i = 0; i < p.size(); ++i) {
         char c = p[i];
-        if (node->_children[c - 'a'] == nullptr) break;
-
-        node = node->_children[c - 'a'];
-        currentPrefix += c;
-
-        if (node->isEndOfWord) longestPrefix = currentPrefix;
+        
+        while (actual && actual->_c != c) {
+            actual = (c < actual->_c) ? actual->_esq : actual->_dre;
+        }
+        
+        if (!actual) break;
+        
+        resultat += c;
+        
+        if (actual->_cen && actual->_cen->_c == '\0') millor_prefix = resultat;
+        
+        actual = actual->_cen;
     }
 
-    return longestPrefix;
+    return millor_prefix.empty() ? "" : millor_prefix;
 }
 
-// Función de patrón
+// Mètode per obtenir paraules que satisfan un patró
+// PRE: q.size() > 0
+// POST: La llista L conté totes les paraules que compleixen el patró q.
+// COSTE: O(n + m * k), on n és el nombre de nodes del Trie, m és la mida de L i k és la longitud màxima de les paraules a la llista.
 void diccionari::satisfan_patro(const vector<string>& q, list<string>& L) const throw(error) {
-    satisfan_patroRecursive(_arrel, q, 0, "", L);
+    
+    llista_paraules(q.size(), L);
+
+    for (auto it = L.begin(); it != L.end(); ) {
+        if (it->size() != q.size() + 1) it = L.erase(it);
+        else ++it;
+    }
+
+    for (auto it = L.begin(); it != L.end(); ) {
+        bool compleix = true;
+
+        for (size_t i = 0; i < q.size(); ++i) {
+            
+            if (q[i] == "*") continue;
+            else if (q[i].find((*it)[i]) == string::npos) {
+                compleix = false;
+                break;
+            }
+        }
+
+        if (!compleix) it = L.erase(it);
+        else ++it;
+    }
+
+    L.sort();
 }
 
-// Lista de palabras de longitud >= k
-void diccionari::llista_paraules(unsigned int k, list<string>& L) const throw(error) {
-    llista_paraulesRecursive(_arrel, k, "", L);
+// Mètode per obtenir paraules amb longitud >= k
+// PRE: k > 0
+// POST: La llista L conté totes les paraules del diccionari amb longitud >= k.
+// COSTE: O(n), on n és el nombre de nodes del Trie.
+void diccionari::llista_paraules(nat k, list<string>& L) const throw(error) {
+    L.clear();
+    string paraula_actual;
+    obtindre_paraules(_arrel, paraula_actual, k, L);
 }
 
-// Número de palabras
+// Mètode per obtenir el nombre de paraules
+// PRE: Cert
+// POST: Retorna el nombre total de paraules emmagatzemades al diccionari.
+// COSTE: O(n), on n és el nombre de nodes del Trie.
 nat diccionari::num_pal() const throw() {
-    return countWords(_arrel);
+    return comptar_paraules(_arrel);
 }
 
-/* FUNCIONS PRIVADES */
+// Funció recursiva per copiar el Trie
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Retorna una còpia exacta del subarbre apuntat per node. Si node == nullptr, retorna nullptr.
+// COST: O(n), on n és el nombre de nodes en el subarbre apuntat per node.
+typename diccionari::TrieNode* diccionari::copia(TrieNode* node) {
 
-// Contar las palabras
-nat diccionari::countWords(TrieNode* node) const throw() {
-    nat count = 0;
-    if (node->isEndOfWord) count++;
-    for (int i = 0; i < 26; i++) {
-        if (node->_children[i] != nullptr) count += countWords(node->_children[i]);
-    }
-    return count;
+    if (!node) return nullptr;
+    
+    TrieNode* nou_node = new TrieNode{node->_c, nullptr, nullptr, nullptr};
+    
+    nou_node->_esq = copia(node->_esq);
+    nou_node->_cen = copia(node->_cen);
+    nou_node->_dre = copia(node->_dre);
+    
+    return nou_node;
 }
 
-// Recursiva para buscar palabras que coincidan con el patrón
-void diccionari::satisfan_patroRecursive(TrieNode* node, const vector<string>& q, size_t index, string current, list<string>& L) const throw() {
-    if (index == q.size()) {
-        if (node->isEndOfWord) L.push_back(current);
-        return;
-    }
+// Funció recursiva per alliberar memòria
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Allibera tota la memòria associada al subarbre apuntat per node. Si node == nullptr, no fa res.
+// COST: O(n), on n és el nombre de nodes en el subarbre apuntat per node.
+void diccionari::allibera(TrieNode* node) {
 
-    string pattern = q[index];
-    for (char c : pattern) {
-        int idx = c - 'A';
-        if (node->_children[idx] != nullptr) satisfan_patroRecursive(node->_children[idx], q, index + 1, current + c, L);
-    }
-}
+    if (!node) return;
 
-// Recursiva para encontrar palabras de longitud >= k
-void diccionari::llista_paraulesRecursive(TrieNode* node, nat k, string current, list<string>& L) const throw() {
-    if (current.size() >= k && node->isEndOfWord) L.push_back(current);
-    for (int i = 0; i < 26; i++) {
-        if (node->_children[i] != nullptr) llista_paraulesRecursive(node->_children[i], k, current + char('A' + i), L);
-    }
-}
-
-typename diccionari::TrieNode* diccionari::copyTrie(TrieNode* node) const {
-    if (node == nullptr) return nullptr;
-
-    TrieNode* newNode = new TrieNode();
-    newNode->isEndOfWord = node->isEndOfWord;
-    for (int i = 0; i < 26; ++i) {
-        if (node->_children[i] != nullptr) newNode->_children[i] = copyTrie(node->_children[i]);
-    }
-    return newNode;
-}
-
-void diccionari::deleteTrie(TrieNode* node) {
-    if (node == nullptr) return;
-    for (int i = 0; i < 26; ++i) {
-        if (node->_children[i] != nullptr) deleteTrie(node->_children[i]);
-    }
+    allibera(node->_esq);
+    allibera(node->_cen);
+    allibera(node->_dre);
+    
     delete node;
+}
+
+// Funció recursiva per obtenir paraules amb longitud >= k
+// PRE: node és un punter a un subarbre vàlid o nullptr. k >= 0.
+// POST: Afegeix a L totes les paraules del subarbre apuntat per node amb longitud >= k.
+// COST: O(n), on n és el nombre de nodes en el subarbre apuntat per node.
+void diccionari::obtindre_paraules(TrieNode* node, string& actual, nat k, list<string>& L) const {
+
+    if (!node) return;
+    obtindre_paraules(node->_esq, actual, k, L);
+
+    actual.push_back(node->_c);
+    if (node->_c == '#' && actual.size() - 1 >= k) L.push_back(actual.substr(0, actual.size() - 1));
+
+    obtindre_paraules(node->_cen, actual, k, L);
+    actual.pop_back();
+
+    obtindre_paraules(node->_dre, actual, k, L);
+}
+
+// Funció recursiva per comptar el nombre de paraules
+// PRE: node és un punter a un subarbre vàlid o nullptr.
+// POST: Retorna el nombre total de paraules en el subarbre apuntat per node.
+// COST: O(n), on n és el nombre de nodes en el subarbre apuntat per node.
+nat diccionari::comptar_paraules(TrieNode* node) const {
+
+    if (!node) return 0;
+
+    nat total = 0;
+    
+    total += comptar_paraules(node->_esq);
+    
+    if (node->_cen && node->_cen->_c == '#') total += 1;
+    
+    total += comptar_paraules(node->_cen);
+    
+    total += comptar_paraules(node->_dre);
+    return total;
 }

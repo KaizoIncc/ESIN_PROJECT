@@ -1,10 +1,53 @@
-nat _n;                    // Tamaño total del conjunto {1, ..., n}/Mida total del conjunt {1, ..., n}
-nat _k;                    // Tamaño de los subconjuntos/Mida dels subconjunts
-subset current_subset;    // Subconjunto actual/Subconjunt actual
-bool is_end;              // Indica si el iterador ha alcanzado el final/Indica si el iterador ha arribat al final
 
-// Método auxiliar para inicializar el primer subconjunto/Métode auxiliar per inicialitzar el primer subconjunt
+/*
+ * Part privada de la classe iter_subset:
+ * 
+ * Aquesta estructura és essencial per implementar un iterador eficient per generar tots els subconjunts
+ * possibles d'una mida fixa (_k) a partir d'un conjunt base de mida _n. S'organitza de manera que el codi
+ * sigui modular i fàcil de mantenir:
+ * 
+ * ATRIBUTS
+ * 
+ * nat _n: Permet definir el conjunt base {1, ..., n}, del qual es generen els subconjunts. Mantenir aquest
+ *         valor com a atribut privat garanteix que l'iterador treballi sempre dins dels límits establerts.
+ * 
+ * nat _k: Defineix la mida dels subconjunts generats. Es guarda com a atribut privat per assegurar que 
+ *         l'iterador només produeixi subconjunts amb la cardinalitat correcta.
+ * 
+ * subset current_subset: Aquest atribut representa l'estat actual del recorregut. Tenir aquest valor com a
+ *                        atribut privat permet gestionar internament el recorregut sense exposar els detalls
+ *                        de la implementació, millorant l'encapsulació i reduint errors.
+ * 
+ * bool is_end: Indica si l'iterador ha completat el recorregut. Aquesta variable permet que l'usuari pugui
+ *              saber si s'han generat tots els subconjunts sense necessitat de gestionar la lògica interna.
+ * 
+ * MÈTODES AUXILIARS
+ * 
+ * void initialize_first_subset(): Aquest mètode assegura que el procés d'iteració comenci de manera correcta,
+ *                                 inicialitzant current_subset amb el primer subconjunt. Encapsular aquesta
+ *                                 lògica en un mètode facilita la reutilització i el manteniment del codi.
+ * 
+ * bool generate_next_subset(): Gestiona la transició entre subconjunts. Aquesta funció encapsula la lògica
+ *                              per calcular el següent subconjunt, mantenint l'estructura del codi clara i
+ *                              separant les responsabilitats. Això també ajuda a detectar fàcilment quan
+ *                              s'han generat tots els subconjunts.
+ * 
+ * L'ús d'aquesta estructura encapsulada garanteix una iteració segura i eficient, protegint els detalls
+ * interns i oferint una interfície clara per als usuaris de la classe. 
+ */
+
+nat _n;                    
+nat _k;                    
+subset current_subset;    
+bool is_end;
+
+//  PRE: Cert
+//  POST: Inicialitza el primer subconjunt de k elements de {1, ..., n}
+//        Si k > n, el subconjunt és buit.
 void initialize_first_subset();
 
-// Método auxiliar para generar el siguiente subconjunto/Métode auxiliar per generar el següent subconjunt
+//  PRE: Cert
+//  POST: Genera el següent subconjunt lexicogràfic de k elements de {1, ..., n}.
+//        Retorna fals si s'ha arribat al final (no queden més subconjunts).
 bool generate_next_subset();
+

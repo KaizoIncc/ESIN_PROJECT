@@ -1,32 +1,38 @@
 #include "iter_subset.hpp"
 
 // Métodes auxiliars de la part privada
+
+//  PRE: Cert
+//  POST: Inicialitza el primer subconjunt de k elements de {1, ..., n}
+//        Si k > n, el subconjunt és buit.
+//  Cost: O(k) per inicialitzar el subconjunt.
 void iter_subset::initialize_first_subset() {
     current_subset.clear();
     for (nat i = 1; i <= _k; ++i) {
         current_subset.push_back(i);
     }
-    is_end = (_k > _n); // Si k > n, no hay subconjuntos posibles
+    is_end = (_k > _n);
 }
 
+//  PRE: Cert
+//  POST: Genera el següent subconjunt lexicogràfic de k elements de {1, ..., n}.
+//        Retorna fals si s'ha arribat al final (no queden més subconjunts).
+//  Cost: O(k) en el pitjor cas, quan hem de reajustar tots els elements després de la posició incrementada.
 bool iter_subset::generate_next_subset() {
-    if (is_end) return false; // Ya se ha alcanzado el final
+    if (is_end) return false;
 
-    // Encuentra la posición más a la derecha que pueda incrementarse
     int i = _k - 1;
     while (i >= 0 && current_subset[i] == _n - _k + i + 1) {
         --i;
     }
 
     if (i < 0) {
-        is_end = true; // No quedan más subconjuntos
+        is_end = true;
         return false;
     }
 
-    // Incrementa el elemento en la posición encontrada
     ++current_subset[i];
 
-    // Ajusta los elementos posteriores para mantener el orden lexicográfico
     for (nat j = i + 1; j < _k; ++j) {
         current_subset[j] = current_subset[j - 1] + 1;
     }
@@ -36,15 +42,18 @@ bool iter_subset::generate_next_subset() {
 
 // Métodes de la part pública
 
-/* Pre:  Cert
-    Post: Construeix un iterador sobre els subconjunts de k elements
-    de {1, ..., n}; si k > n no hi ha res a recórrer. */
+//  PRE: Cert
+//  POST: Construeix un iterador sobre els subconjunts de k elements
+//        de {1, ..., n}; si k > n no hi ha res a recórrer. 
+//  Cost: O(k) per inicialitzar el primer subconjunt.
 iter_subset::iter_subset(nat n, nat k) throw(error) : _n(n), _k(k), is_end(false) {
-    if (k > n) is_end = true;   // Si k > n, no hi ha subconjunts possibles
-    else initialize_first_subset(); // Inicialitza el primer subconjunt
+    if (k > n) is_end = true;
+    else initialize_first_subset();
 }
 
-/* Tres grans. Constructor per còpia. */
+//  PRE: Cert
+//  POST: Crea una còpia de l'iterador iter_subset.
+//  Cost: O(k) per copiar el subconjunt actual.
 iter_subset::iter_subset(const iter_subset& its) throw(error) {
     this->_n = its._n;
     this->_k = its._k;
@@ -52,7 +61,9 @@ iter_subset::iter_subset(const iter_subset& its) throw(error) {
     this->is_end = its.is_end;
 }
 
-/* Tres grans. Operador d'assignació. */
+//  PRE: Cert
+//  POST: Assigna el contingut de l'iterador other a l'iterador actual.
+//  Cost: O(k) per copiar el subconjunt actual.
 iter_subset &iter_subset::operator=(const iter_subset& its) throw(error) {
     if(this != &its) {
         _n = its._n;
@@ -64,66 +75,68 @@ iter_subset &iter_subset::operator=(const iter_subset& its) throw(error) {
     return *this;
 }
 
-/* Tres grans. Destructor. */
+//  PRE: Cert
+//  POST: Destrueix l'iterador iter_subset.
+//  Cost: O(1).
 iter_subset::~iter_subset() throw() {
 
 }
 
-/*  Pre:  Cert
-    Post: Retorna cert si l'iterador ja ha visitat tots els subconjunts
-    de k elements presos d'entre n; o dit d'una altra forma, retorna
-    cert quan l'iterador apunta a un subconjunt sentinella fictici
-    que queda a continuació de l'últim subconjunt vàlid. */
+//  PRE: Cert
+//  POST: Retorna cert si l'iterador ja ha visitat tots els subconjunts
+//        de k elements presos d'entre n; retorna fals si encara queden subconjunts.
+//  Cost: O(1).
 bool iter_subset::end() const throw() {
     return is_end;
 }
 
-/*  Operador de desreferència.
-    Pre:  Cert
-    Post: Retorna el subconjunt apuntat per l'iterador;
-    llança un error si l'iterador apunta al sentinella. */
+//  PRE: Cert
+//  POST: Retorna el subconjunt apuntat per l'iterador;
+//          llança un error si l'iterador apunta al sentinella. 
+//  Cost: O(k) per copiar el subconjunt.
 subset iter_subset::operator*() const throw(error) {
     if(is_end) throw error(IterSubsetIncorr);
     return current_subset;
 }
 
+//  PRE: Cert
+//  POST: Avança l'iterador a la següent posició del conjunt;
+//        si s'arriba al final, l'iterador entra en el mode final.
+//  Cost: O(k).
 iter_subset &iter_subset::operator++() throw() {
     if (!is_end) {
-        generate_next_subset(); // Genera el siguiente subconjunto
-        if (current_subset.empty()) {
-            // Si no hay más subconjuntos, establece el iterador en el estado final
-            is_end = true;
-        }
+        generate_next_subset();
+        if (current_subset.empty()) is_end = true;
     }
     return *this;
 }
 
+//  PRE: Cert
+//  POST: Retorna una còpia de l'iterador abans de l'increment. 
+//  Cost: O(k).
 iter_subset iter_subset::operator++(int) throw() {
-    iter_subset temp = *this; // Crea una copia del iterador actual
-    ++(*this);               // Utiliza el preincremento para avanzar al siguiente subconjunto
-    return temp;             // Devuelve la copia que contiene el estado previo
+    iter_subset temp = *this;
+    ++(*this);
+    return temp;
 }
 
+//  PRE: Cert
+//  POST: Compara si dos iteradors apunten a la mateixa posició.
+//        Retorna cert si són iguals, fals altrament.
+//  Cost: O(k).
 bool iter_subset::operator==(const iter_subset& other) const throw() {
-    // Caso especial: si k = 0, ambos iteradores apuntan al mismo subconjunto vacío
-    if (_k == 0 && other._k == 0) {
-        return is_end == other.is_end; // Compara únicamente el estado final
-    }
+    if (_k == 0 && other._k == 0) return is_end == other.is_end;
 
-    // Compara el tamaño total del conjunto y el tamaño de los subconjuntos
-    if (_n != other._n || _k != other._k) {
-        return false; // No pueden ser iguales si n o k son diferentes
-    }
+    if (_n != other._n || _k != other._k) return false;
+    
+    if (is_end != other.is_end) return false;
 
-    // Compara el estado final de los iteradores
-    if (is_end != other.is_end) {
-        return false; // Si uno está al final y el otro no, no son iguales
-    }
-
-    // Compara los subconjuntos actuales
     return current_subset == other.current_subset;
 }
 
+//  PRE: Cert
+//  POST: Retorna cert si els iteradors no són iguals.
+//  Cost: O(k).
 bool iter_subset::operator!=(const iter_subset& other) const throw() {
     return !(*this == other);
 }

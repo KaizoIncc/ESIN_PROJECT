@@ -2,10 +2,11 @@
 #include <algorithm>
 
 /**
- * Pre: Cert
- * Post: @return true si les lletres de l'string s
- *       estan en ordre lexicogràfic ascendent. Altrament,
- *       @return false 
+ *  Pre: Cert
+ *  Post: Retorna true si les lletres de l'string s
+ *        estan en ordre lexicogràfic ascendent. Altrament,
+ *        retorna false.
+ *  Cost: O(n)
  */
 bool word_toolkit::es_canonic(const string& s) throw() {
     
@@ -16,9 +17,9 @@ bool word_toolkit::es_canonic(const string& s) throw() {
     return true;
 }
 
-/**
- * Pre: Cert
- * Post: @return l'anagrama canònic del string s.
+/*  Pre: Cert
+ *  Post: Retorna l'anagrama canònic del string s.
+ *  Cost: O(n log n)
  */
 string word_toolkit::anagrama_canonic(const string& s) throw() {
     string res = s;
@@ -26,24 +27,26 @@ string word_toolkit::anagrama_canonic(const string& s) throw() {
     return res;
 }
 
-/** Pre: L és una llista no buida de paraules formades exclusivament
+/*  Pre: L és una llista no buida de paraules formades exclusivament
  *  amb lletres majúscules de la 'A' a la 'Z' (excloses la 'Ñ', 'Ç',
  *  majúscules accentuades, ...). 
- *  Post: @return el caràcter que no apareix a l'string excl i és
+ *  Post: Retorna el caràcter que no apareix a l'string excl i és
  *  el més freqüent en la llista de paraules L.
- *  En cas d'empat, es @return el caràcter alfabèticament menor.
+ *  En cas d'empat, es retorna el caràcter alfabèticament menor.
  *  Si l'string excl inclou totes les lletres de la 'A' a la 'Z' es 
- *  @return el caràcter '\0', és a dir, el caràcter de codi ASCII 0. */
+ *  retorna el caràcter '\0', és a dir, el caràcter de codi ASCII 0.
+ *  Cost:  O(m + n * k) on m es la mida de excl, n és nombre de paraules 
+ *         a la llista L i k es la mida promig de les paraules de la llista L
+ */
 char word_toolkit::mes_frequent(const string& excl, const list<string>& L) throw() {
     int freq[26] = {0};
 
     for(int i = 0; i < (int)excl.size(); ++i) {
         char c = excl[i];
 
-        if(c >= 'A' && c <= 'Z') freq[c - 'A'] = -1; // Exclusió de les lletres excl
+        if(c >= 'A' && c <= 'Z') freq[c - 'A'] = -1;
     }
 
-    // Compta la freqüència de les lletres en L
     for(list<string>::const_iterator it = L.begin(); it != L.end(); ++it) {
         const string paraula = *it;
         for(int i = 0; i < (int)paraula.size(); ++i) {
@@ -53,7 +56,6 @@ char word_toolkit::mes_frequent(const string& excl, const list<string>& L) throw
         }
     }
 
-    // Busca el caràcter més freqüent en el array de freqüencies.
     char resultat = '\0';
     int max_freq = 0;
     for(int i = 0; i < 26; ++i) {

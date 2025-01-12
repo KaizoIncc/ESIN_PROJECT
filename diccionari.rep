@@ -1,15 +1,29 @@
+
+/* 
+ * La classe `diccionari` utilitza una estructura Trie per representar
+ * eficientment un conjunt de paraules. Cada node de l'arbre (TrieNode) conté:
+ * 
+ *  - `_c`: El caràcter que representa aquest node.
+ *  - `_cen`: Apuntador al fill central, que conté el següent caràcter de la paraula.
+ *  - `_esq`: Apuntador al fill esquerre, que conté caràcters menors segons ordre alfabètic.
+ *  - `_dre`: Apuntador al fill dret, que conté caràcters majors segons ordre alfabètic.
+ * 
+ * Aquesta estructura permet:
+ * 1. Buscar prefixos i paraules completes en temps eficient.
+ * 2. Afegir i eliminar paraules amb un mínim de reestructuració.
+ * 3. Optimitzar l'ús de memòria, ja que els prefixos comuns són compartits.
+ */
 struct TrieNode {
-    TrieNode* _children[26]; // Hijos para cada letra (A-Z)
-    bool isEndOfWord; // Indicador de si es una palabra completa
-    TrieNode() : isEndOfWord(false) {
-        fill(begin(_children), end(_children), nullptr);
-    }
+    char _c;
+    TrieNode* _cen;
+    TrieNode* _esq;
+    TrieNode* _dre;
 };
 
 TrieNode* _arrel; // Raíz del trie
 
-nat countWords(TrieNode* node) const throw();
-void satisfan_patroRecursive(TrieNode* node, const vector<string>& q, size_t index, string current, list<string>& L) const throw();
-void llista_paraulesRecursive(TrieNode* node, nat k, string current, list<string>& L) const throw();
-TrieNode* copyTrie(TrieNode* node) const;
-void deleteTrie(TrieNode* node);
+TrieNode* copia(TrieNode* node);
+void allibera(TrieNode* node);
+nat comptar_paraules(TrieNode* node) const;
+void obtindre_paraules(TrieNode* node, string& actual, nat k, list<string>& L) const;
+
