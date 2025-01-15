@@ -40,6 +40,7 @@ void diccionari::insereix(const string& p) throw(error) {
     string paraula = p;
     paraula += '#';
     _arrel = insereix(_arrel, paraula, 0);
+    ++_paraules;
 }
 
 
