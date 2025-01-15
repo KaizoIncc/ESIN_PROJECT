@@ -10,7 +10,7 @@
  * 
  * Aquesta estructura permet:
  * 1. Buscar prefixos i paraules completes en temps eficient.
- * 2. Afegir i eliminar paraules amb un mínim de reestructuració.
+ * 2. Afegir paraules amb un mínim de reestructuració.
  * 3. Optimitzar l'ús de memòria, ja que els prefixos comuns són compartits.
  */
 struct TrieNode {
@@ -28,8 +28,9 @@ TrieNode* copia(TrieNode* node);
 // PRE: node és un punter a un subarbre vàlid o nullptr.
 // POST: Allibera tota la memòria associada al subarbre apuntat per node. Si node == nullptr, no fa res.
 void allibera(TrieNode* node);
-
 // PRE: node és un punter a un subarbre vàlid o nullptr. k >= 0.
 // POST: Afegeix a L totes les paraules del subarbre apuntat per node amb longitud >= k.
 void obtindre_paraules(TrieNode* node, string& actual, nat k, list<string>& L) const;
-
+// PRE: 0 <= i < p.size(), node és l'arrel d'un subarbre vàlid o nullptr
+// POST: Insereix el sufix p[i:] al trie representat per node i retorna l'arrel de l'arbre actualitzat
+TrieNode* insereix(TrieNode* node, const string& paraula, nat i);
